@@ -1,0 +1,43 @@
+64/128/64
+
+First 3 relu
+linear / relu
+Train Score: 0.010639 MSE (0.103147 RMSE)
+Test Score: 0.015748 MSE (0.125491 RMSE)
+
+hard sigmoid
+Train Score: 0.023285 MSE (0.152593 RMSE)
+Test Score: 0.023034 MSE (0.151769 RMSE)
+
+tanh
+Train Score: 0.006751 MSE (0.082162 RMSE)
+Test Score: 0.008786 MSE (0.093736 RMSE)
+
+
+First 3 hard sigmoid
+linear / relu
+Train Score: 0.018758 MSE (0.136960 RMSE)
+Test Score: 0.010917 MSE (0.104484 RMSE)
+
+hard sigmoid
+Train Score: 0.056395 MSE (0.237476 RMSE)
+Test Score: 0.049331 MSE (0.222107 RMSE)
+
+tanh
+Train Score: 0.033738 MSE (0.183680 RMSE)
+Test Score: 0.024535 MSE (0.156638 RMSE)
+
+
+First 3 tanh
+linear / relu	*****
+Train Score: 0.005947 MSE (0.077118 RMSE)
+Test Score: 0.006395 MSE (0.079968 RMSE)
+
+hard sigmoid
+Train Score: 0.009130 MSE (0.095550 RMSE)
+Test Score: 0.011730 MSE (0.108305 RMSE)
+
+tanh
+Train Score: 0.006918 MSE (0.083176 RMSE)
+Test Score: 0.008368 MSE (0.091475 RMSE)
+
