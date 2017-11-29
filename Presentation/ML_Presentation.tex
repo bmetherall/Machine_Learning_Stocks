@@ -1,0 +1,123 @@
+\documentclass[mathserif]{beamer}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{amsfonts}
+\usepackage{xcolor,graphicx}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{mathrsfs}
+
+\title{Forecasting Stocks}
+\author{Brady Metherall}
+\date{Wednesday November 29, 2017}
+
+\usetheme{Berkeley}
+\usecolortheme{whale}
+
+\begin{document}
+\frame{\titlepage}
+\setlength\parindent{0pt}
+
+\section{Black-Scholes Model}
+
+\frame{
+\frametitle{Black-Scholes Model}
+To generate data the Black-Scholes model was used. The Black-Scholes model is a mathematical model for the financial market. It is defined by the stochastic differential equation
+\begin{align*}
+dS &= \mu S dt + \sigma S dW_t,
+\end{align*}
+where $\mu$ is the trend, $\sigma$ the variance / volatility, and $W_t$ is a Brownian motion. This can be discretized as
+\begin{align*}
+S_{t+1} &= S_t \left( 1 + \mu \Delta t + \sigma \mathcal{N}(0,1) \sqrt{\Delta t} \right).
+\end{align*}
+}
+
+\frame{
+\frametitle{Black-Scholes Model}
+However, historical financial data is only available on a day-to-day basis. To have similar data, we let $\Delta t = 1$ min. so that $1440 \Delta t = 1$ day. And so, the open, close, min, and max can be extracted in each block of 1440 time steps.
+}
+
+\frame{
+\frametitle{Black-Scholes Model}
+\begin{figure}
+\input{ToyStock}
+\end{figure}
+}
+
+\section{Network}
+
+\frame{
+\frametitle{Network}
+Network Parameters:
+\begin{tabular}{l l l}
+Parameter & First Layer & Second Layer \\
+\hline
+Type & LSTM & Fully Connected \\
+Number of Neurons & 64 & 5 \\
+Activation & Tanh & Tanh \\
+Dropout & 10\% & N/A
+\end{tabular} \\
+\vspace{4mm}
+Training Parameters:
+\begin{tabular}{l l}
+Parameter & Value \\
+\hline
+Loss & Mean Absolute Percent Error \\
+Optimizer & Adam \\
+Window & 15 \\
+Batch Size & 64 \\
+Validation & 20\% \\
+Epochs & 50
+\end{tabular}
+}
+
+\frame{
+\frametitle{Regular Normalization}
+\begin{figure}
+\input{BadNorm}
+\end{figure}
+}
+
+\frame{
+\frametitle{Flipped Normalization}
+\begin{figure}
+\input{GoodNorm}
+\end{figure}
+}
+
+\section{Results}
+
+\frame{
+\frametitle{Google}
+\begin{figure}
+\input{Google}
+\end{figure}
+}
+
+\frame{
+\frametitle{Apple}
+\begin{figure}
+\input{Apple}
+\end{figure}
+}
+
+\frame{
+\frametitle{Absolute Difference}
+\begin{figure}
+\input{diff}
+\end{figure}
+}
+
+\frame{
+\frametitle{Percent Difference}
+\begin{figure}
+\input{Percent}
+\end{figure}
+}
+
+\frame{
+\frametitle{Conclusion}
+This model can predict stock prices within about 2\%, however, this is more than the day-to-day fluctuations. Moreover, the prediction seems to lag behind the stock by approximately a week, and so it is probably unwise to invest money based this model.
+}
+
+\end{document}

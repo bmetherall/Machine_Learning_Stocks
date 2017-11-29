@@ -1,0 +1,4 @@
+\beamer@endinputifotherversion {3.36pt}
+\beamer@sectionintoc {1}{Black-Scholes Model}{2}{0}{1}
+\beamer@sectionintoc {2}{Network}{5}{0}{2}
+\beamer@sectionintoc {3}{Results}{8}{0}{3}
