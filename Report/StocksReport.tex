@@ -45,7 +45,7 @@ where $S$ is the stock price, $\mu$ is the drift / trend, $\sigma$ is the standa
 \begin{align*}
 S_{t+1} &= S_t \left( 1 + \mu \Delta t + \sigma \mathcal{N}(0,1) \sqrt{\Delta t} \right)
 \end{align*}
-which is known as the Euler scheme. This algorithm can easily be implemented to simulate a stock. However, this approximates the continuous price of a stock, and not the features which are provided by Yahoo Finance. \\
+which is known as the Euler scheme. This algorithm can easily be implemented to simulate a stock. However, this approximates the continuous price of a stock and not the features which are provided by Yahoo Finance. \\
 
 \begin{figure}[htbp]
 \centering
@@ -60,13 +60,13 @@ plot '../DailyStocksBig.dat' u 1 w l not
 \label{fig:toystock}
 \end{figure}
 
-In order to transform this continuous data, suppose $\Delta t = 1$ minute, then $1440 \Delta t = 1$ day. Let $N$ be the number of simulated days, in this case 20000, and simulate for $1440N$ time steps. The array $S$ can be reshaped to $N \times 1440$ so that each row represents a particular day, and each column represents a particular time. Since historic stock data only contains the open, close, high, and low prices per day these must be extracted. In this scheme the 570th time step would represent the stock price at 9:30am, and the 960th time step would be the price at 4:00pm. These times coincide with the open and close times of the stock market. Thus, the 570th column of $S$ is the open price, whereas the 960th column is the close price. To find the high, and low price for the day the maximum, and minimum are taken within this range. Extracting these numbers gives the same form of data as the available historical stock data. The realization of this discretization used for training can be seen in Figure \ref{fig:toystock}.
+In order to transform this continuous data, suppose $\Delta t = 1$ minute, then $1440 \Delta t = 1$ day. Let $N$ be the number of simulated days, in this case 20000, and simulate for $1440N$ time steps. The array $S$ can be reshaped to $N \times 1440$ so that each row represents a particular day, and each column represents a particular time. Since historic stock data only contains the open, close, high, and low prices per day these must be extracted. In this scheme the 570th time step would represent the stock price at 9:30am, and the 960th time step would be the price at 4:00pm. These times coincide with the open and close times of the stock market. Thus, the 570th column of $S$ is the open price, whereas the 960th column is the close price. To find the high and low price for the day, the maximum and minimum are taken within this range. Extracting these numbers gives the same form of data as the available historical stock data. The realization of this discretization used for training can be seen in Figure \ref{fig:toystock}.
 
 \section{Neural Network}
 
 For this project Keras with the TensorFlow back-end was used. For an application such as forecasting, clearly a recurrent neural network (RNN) would be best since we wish the network to have a memory of prior events in order to better its predictions. More specifically, long short-term memory (LSTM) is used to counteract exploding / vanishing gradients. \\
 
-Initially, the neural network was trained for classification. The classifications were effectively `up', `down', and `neutral'; a particular day was classified as `up' if the price in the following day was at least $4\%$ higher, likewise a decrease of $4\%$ would be classified as `down', otherwise the classification was `neutral'. This proved ineffective, because of the stochasticity of the stock market the network was unable to learn any patterns. After training, regardless of the input, the network returned $(0.395, 0.388, 0.216)$ as the predicted probability distribution. These values coincide with the frequency of labels, the network simply learned the frequency of each label and always predicted this. \\
+Initially, the neural network was trained for classification. The classifications were effectively `up', `down', and `neutral'; a particular day was classified as `up' if the price in the following day was at least $4\%$ higher, likewise a decrease of $4\%$ would be classified as `down', otherwise the classification was `neutral'. This proved ineffective because of the stochasticity of the stock market the network was unable to learn any patterns. After training, regardless of the input, the network returned $(0.395, 0.388, 0.216)$ as the predicted probability distribution. These values coincide with the frequency of labels; the network simply learned the frequency of each label and always predicted this. \\
 
 To alleviate this problem we change the task to one of regression. The network had the most success with a fairly simple architecture; two layers with 64 and 5 neurons respectively, and hyperbolic tangent as both activation functions, more details can be found in Table \ref{tab:param}. The input features of the network are the open, close, high, and low values for each of the last 15 days (the window parameter in Table \ref{tab:train}), the output features are the predicted open price of the next 5 days (the number of neurons in the fully connected layer). Furthermore, the mean absolute percentage error (MAPE) was used for calculating the loss. The following section details why the hyperbolic tangent function and MAPE had the greatest success.
 
@@ -109,13 +109,13 @@ Epochs & 50 \\
 
 \subsection{Stock Normalization}
 
-This neural network predicts the open prices of a stock in the following days, yet uses hyperbolic tangent as the activation functions. The ranges of these are wildly different, and so the stock data must first be normalized. For example, the current value of a Google share is about \$1000, whereas hyperbolic tangent's range is $(-1, 1)$. Thus a normalization function is needed to map any stock to this range. \\
+This neural network predicts the open prices of a stock in the following days, yet uses hyperbolic tangent as the activation functions. The ranges of these are wildly different, and so the stock data must first be normalized. For example, the current value of a Google share is about \$1000, whereas hyperbolic tangent's range is $(-1, 1)$. Thus, a normalization function is needed to map any stock to this range. \\
 
 The most natural choice is to simply subtract the minimum and divide by the amplitude. Algebraically, this can be accomplished by
 \begin{align*}
 |S| &= \alpha \frac{S - \min(S)}{\max(S) - \min(S)},
 \end{align*}
-where $\alpha$ is a scaling parameter which defines the maximum value after normalization. This parameter is important because of the non-linearity of the hyperbolic tangent function, to achieve the maximum value of unity the input must be infinite which is impractical for a neural network, and so $\alpha$ reduces the scale of the weights. In all cases $\alpha = 0.8$ was used. \\
+where $\alpha$ is a scaling parameter which defines the maximum value after normalization. This parameter is important because of the non-linearity of the hyperbolic tangent function; to achieve the maximum value of unity the input must be infinite which is impractical for a neural network, and so $\alpha$ reduces the scale of the weights. In all cases $\alpha = 0.8$ was used. \\
 
 \begin{figure}[htbp]
 \centering
@@ -147,12 +147,12 @@ plot '../BadNormal.dat' u 3 w l t 'Prediction', \
 \caption{Linear normalization with reflection of sample stock.}
 \label{fig:goodnormal}
 \end{subfigure}
-\caption{Two normalization schemes for training. The loss was calculated by the mean absolute percentage difference, resulting in a better accuracy is achieved for small values. The reflected scheme provides the better present day prediction.}
+\caption{Two normalization schemes for training. The loss was calculated by the mean absolute percentage difference -- a better accuracy is achieved for small values. The reflected scheme provides the better present day prediction.}
 \end{figure}
 
-Figure \ref{fig:badnormal} shows the prediction after the network is fully trained. Clearly, as time goes on the prediction becomes less accurate. At first this was assumed to be caused simply by the errors compounding. In fact, this is a consequence of the loss function. Since the loss is calculated by the absolute percentage difference, the network is forced to have a higher accuracy for smaller numbers. This is best seen in an example: suppose the normalized price of a stock is 0.05 and the predicted price is 0.075 -- this estimate is fairly close, although it equates to a 50\% error. Conversely, if the normalized stock price is 0.5 and the prediction is 0.6, the absolute difference is four times as large as the previous example, but only an error of 20\%. For this reason the model is most accurate for small values. \\
+Figure \ref{fig:badnormal} shows the prediction after the network is fully trained. Clearly, as time goes on, the prediction becomes less accurate. At first this was assumed to be caused simply by the errors compounding. In fact, this is a consequence of the loss function. Since the loss is calculated by the absolute percentage difference, the network is forced to have a higher accuracy for smaller numbers. This is best seen in an example: suppose the normalized price of a stock is 0.05 and the predicted price is 0.075 -- this estimate is fairly close, although it equates to a 50\% error. Conversely, if the normalized stock price is 0.5 and the prediction is 0.6, the absolute difference is four times as large as the previous example, but only an error of 20\%. For this reason the model is most accurate for small values. \\
 
-Initially, this seems undesirable since the best prediction occurs at the beginning of the stock's history. However, this effect can be exploited if the stock is reflected about $\frac{1}{2} \alpha$. This can be done by instead normalizing with 
+Initially, this seems undesirable since the best prediction occurs at the beginning of the stock's history. However, this effect can be exploited if the stock is reflected about $\frac{1}{2} \alpha$. This can be done by normalizing instead with 
 \begin{align}
 |S| &= \alpha \frac{\max(S) - S}{\max(S) - \min(S)}.
 \label{eq:norm}
@@ -163,7 +163,7 @@ S &= \max (S) - |S| \frac{\max (S) - \min (S)}{\alpha}.
 \end{align*}
 Figure \ref{fig:goodnormal} shows the prediction after training on this new normalization. As expected, the most accurate prediction still occurs for small normalized stock prices. However, this region is now at the present time instead of the stock's inception; much more useful for forecasting. \\
 
-Moreover, notice that this normalized stock has a minimum value of $0$, whereas the minimum of hyperbolic tangent is $-1$. This is desirable considering a stock could surpass its previous maximum, resulting in a negative value in the normalized space. An activation such as ReLU, or sigmoid would not be able to handle such an event, whereas hyperbolic tangent is capable.
+Moreover, notice that this normalized stock has a minimum value of $0$, whereas the minimum of hyperbolic tangent is $-1$. This is desirable considering a stock could surpass its previous maximum resulting in a negative value in the normalized space. An activation such as ReLU, or sigmoid would not be able to handle such an event, whereas hyperbolic tangent is capable.
 
 \section{Application to Real Stocks}
 
@@ -196,9 +196,9 @@ plot '../Predictions.dat' u 1:5 w l t 'Prediction', \
 \label{fig:pred}
 \end{figure}
 
-The historical stock data was pulled from Yahoo Finance using the \texttt{pandas\_datareader} package in Python. This package includes the function \texttt{get\_data\_yahoo} which takes the stock's ticker symbol as its argument and pulls a dataframe of the stock's history. From this dataframe the required data can be extracted and normalized, this can then be fed into the model. The model was tested / verified using two stocks, Google and Apple. The model's predictions for the last 90 days are shown in Figure \ref{fig:pred}. \\
+The historical stock data was pulled from Yahoo Finance using the \texttt{pandas\_datareader} package in Python. This package includes the function \texttt{get\_data\_yahoo} which takes the stock's ticker symbol as its argument and pulls a dataframe of the stock's history. From this dataframe, the useful data can be extracted and normalized, this can then be fed into the model. The model was tested / verified using two stocks, Google and Apple. The model's predictions for the last 90 days are shown in Figure \ref{fig:pred}. \\
 
-The model's prediction seems to estimate the price of the two stocks reasonably well -- recall the model was trained using only the simulated Black-Scholes stock. Nonetheless, there is a glaring pitfall of this model, the prediction lags behind the actual stock price by about about six days. Unfortunately, although the model was trained to estimate the open price of the next five days (a day per neuron in the second layer), each of those predictions are practically the same. The difference is that the day five predictions are a little smoother than the day one predictions without providing any additional insight. This lagging behind is most evident when the price steadily increases or decreases such as near the beginning and end of the 90 day period for Google. \\
+The model's prediction seems to estimate the price of the two stocks reasonably well -- recall the model was trained using only the simulated Black-Scholes stock. Nonetheless, there is a glaring pitfall of this model, the prediction lags behind the actual stock price by about six days. Unfortunately, although the model was trained to estimate the open price of the next five days (a day per neuron in the second layer), each of those predictions are practically the same. The difference is the day five predictions are a little smoother than the day one predictions without providing any additional insight. This lagging behind is most evident when the price steadily increases or decreases such as near the beginning and the end of the 90 day period for Google. \\
 
 \begin{figure}[htbp]
 \centering
@@ -215,7 +215,7 @@ plot 0 w l lc 8 not, \
 \label{fig:percent}
 \end{figure}
 
-Since the model was trained using the mean absolute percentage difference, it is useful to investigate the accuracy of the predictions with a more qualitative measure. Figure \ref{fig:percent} shows the percentage error for both stocks. The mean absolute percentage error (MAPE) over this 90 day period is $2.06\%$ and $2.28\%$ for the Google and Apple stocks respectively. While this is a very good accuracy for a neural network, sadly it is not good enough. The day-to-day fluctuations of the stocks are only $0.68\%$ and $0.92\%$ for Google and Apple respectively. Hence, simply assuming tomorrow's open price will we be the same as today's will give better results.
+Since the model was trained using the mean absolute percentage difference, it is useful to investigate the accuracy of the predictions with a more qualitative measure. Figure \ref{fig:percent} shows the percentage error for both stocks. The mean absolute percentage error (MAPE) over this 90 day period is $2.06\%$ and $2.28\%$ for the Google and Apple stocks respectively. While this is a very good accuracy for a neural network, sadly it is not good enough. The day-to-day fluctuations of the stocks are only $0.68\%$ and $0.92\%$ for Google and Apple respectively. Hence, simply assuming tomorrow's open price will be the same as today's will give better results.
 
 \section{Conclusion}
 
