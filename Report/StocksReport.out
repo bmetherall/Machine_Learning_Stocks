@@ -1,0 +1,7 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Generating Training Data}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Black-Scholes Model}{section.2}% 3
+\BOOKMARK [1][-]{section.3}{Neural Network}{}% 4
+\BOOKMARK [2][-]{subsection.3.1}{Stock Normalization}{section.3}% 5
+\BOOKMARK [1][-]{section.4}{Application to Real Stocks}{}% 6
+\BOOKMARK [1][-]{section.5}{Conclusion}{}% 7
